@@ -1,0 +1,15 @@
+# _headers – Cloudflare Pages
+# קובץ זה מגדיר HTTP headers לכל הדפים
+
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/admin/*
+  X-Robots-Tag: noindex
+
+# Cache static assets aggressively
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

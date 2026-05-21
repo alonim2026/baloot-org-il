@@ -1,0 +1,49 @@
+---
+// src/pages/articles/index.astro
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const articles = await getCollection('articles');
+---
+
+<Base title="עץ האלון" description="מאמרים ומידע על עצי האלון בישראל">
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="tag">ידע ומידע</span>
+      <h1>עץ האלון</h1>
+      <p class="hero-sub">מאמרים, מחקרים ומדריכים על עצי האלון בישראל</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid-3">
+        {articles.map(article => (
+          <a href={`/articles/${article.slug}`} class="card">
+            {article.data.topImage && (
+              <img src={article.data.topImage} alt={article.data.title} class="card-img" loading="lazy" />
+            )}
+            <div class="card-body">
+              <h3 class="card-title">{article.data.title}</h3>
+              {article.data.excerpt && <p class="card-excerpt">{article.data.excerpt}</p>}
+              <span class="card-link">קרא עוד</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+.page-hero {
+  background: linear-gradient(135deg, var(--clr-oak-900), var(--clr-oak-700));
+  color: white;
+  padding: var(--space-16) 0 var(--space-12);
+}
+.page-hero h1 { color: white; margin: var(--space-4) 0 var(--space-3); }
+.hero-sub { font-size: var(--fs-lg); opacity: 0.8; }
+.grid-3 a { text-decoration: none; color: inherit; }
+</style>

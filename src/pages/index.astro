@@ -1,0 +1,376 @@
+---
+// src/pages/index.astro
+import Base from '../layouts/Base.astro';
+import { getEntry, getCollection } from 'astro:content';
+
+const home = await getEntry('pages', 'home');
+const { hero, banners, upcomingEvents, eventsBackgroundImage, donations } = home.data;
+
+function stripMd(text: string = '') {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\n/g, ' ')
+    .trim();
+}
+
+const allPosts = await getCollection('blog');
+const latestPosts = allPosts
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3);
+
+function formatDate(d: Date | string) {
+  return new Date(d).toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+const overlayText = (home.data as any).heroOverlayText ?? '';
+---
+
+<Base title="אלוני ישראל – עמותה לשמירה על עצי האלון">
+
+  <!-- ══════════════════════════════════════════
+       HERO – סרטון רקע
+  ══════════════════════════════════════════ -->
+  <section class="hero">
+
+    <!-- סרטון רקע -->
+    <video
+      id="hero-video"
+      class="hero-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      poster="/uploads/2020/08/T1-1.jpg"
+    >
+      <source src="https://baloot.org.il/wp-content/themes/frontend/assets/images/1895504082.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-overlay"></div>
+
+    <!-- כיתוב ראשי — מרכז עליון -->
+    <div class="hero-title-wrap">
+      <h1 class="hero-title">{hero?.title ?? 'להשיב את חורש האלונים הטבעי לשיאו'}</h1>
+    </div>
+    <!-- אייקוני צד שמאל — תרומות, רישום, ניוזלטר, דיווח -->
+    <div class="side-icons-left">
+      <a href="/articles/registration-fee-donation" class="side-icon" title="תרומות">
+        <img src="https://baloot.org.il/wp-content/themes/frontend/assets/images/btn_charity.png" alt="תרומות" />
+        <span>תרומות</span>
+      </a>
+      <a href="/articles/registration-fee-donation" class="side-icon" title="רישום לעמותה">
+        <img src="https://baloot.org.il/wp-content/themes/frontend/assets/images/btn_registration.png" alt="רישום לעמותה" />
+      </a>
+      <a href="https://drive.google.com/file/d/1NNQ9Fm6fCTHj4SyANR85jQipf6W2z-GS/view" class="side-icon" title="ניוזלטר" target="_blank" rel="noopener">
+        <img src="https://baloot.org.il/wp-content/themes/frontend/assets/images/btn_newsletter.png" alt="ניוזלטר" />
+      </a>
+      <a href="https://drive.google.com/file/d/1ls9_sAAH5vdovQLm2NDhqcP3BSRQ4yqp/view" class="side-icon" title="דיווח על עץ בצרה" target="_blank" rel="noopener">
+        <img src="https://baloot.org.il/wp-content/themes/frontend/assets/images/btn_report_hazards.png" alt="דיווח על עץ בצרה" />
+        <span>דיווח על עץ בצרה</span>
+      </a>
+    </div>
+
+    <!-- כפתור רמקול — פינה ימין תחתון -->
+    <button class="sound-btn" id="sound-btn" aria-label="הפעל/כבה שמע">
+      <svg id="icon-muted" class="sound-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="23" y1="9" x2="17" y2="15"/>
+        <line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>
+      <svg id="icon-sound" class="sound-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+    </button>
+
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       BANNERS
+  ══════════════════════════════════════════ -->
+  {banners && banners.map((banner, i) => (
+    <section class={`section banner-section ${i % 2 === 1 ? 'banner-flip' : ''}`}>
+      <div class="container banner-grid">
+        <div class="banner-text">
+          <span class="tag">{banner.title}</span>
+          <p>{stripMd(banner.text)}</p>
+          {banner.link && (
+            <a href={banner.link.url} class="btn btn-outline"
+               target={banner.link.url.startsWith('http') ? '_blank' : undefined}>
+              {banner.link.title ?? 'קרא עוד'}
+            </a>
+          )}
+        </div>
+        {banner.image && (
+          <div class="banner-img-wrap">
+            <img src={banner.image} alt={banner.title} class="banner-img" />
+          </div>
+        )}
+      </div>
+    </section>
+  ))}
+
+  <!-- ══════════════════════════════════════════
+       UPCOMING EVENTS
+  ══════════════════════════════════════════ -->
+  {upcomingEvents && upcomingEvents.length > 0 && (
+    <section class="section events-section"
+      style={eventsBackgroundImage ? `background-image: url('${eventsBackgroundImage}')` : ''}>
+      <div class="container">
+        <div class="section-header">
+          <h2 style="color:white">אירועים קרובים</h2>
+          <a href="/events" class="btn btn-ghost">כל האירועים</a>
+        </div>
+        <div class="events-grid">
+          {upcomingEvents.map(ev => (
+            <div class="event-card">
+              <p class="event-date">{ev.date}</p>
+              <h3 class="event-title">{ev.title}</h3>
+              {ev.description && <p class="event-desc">{stripMd(ev.description)}</p>}
+              {ev.link && (
+                <a href={ev.link.url} class="btn btn-outline event-btn">
+                  {ev.link.title ?? 'פרטים'}
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ══════════════════════════════════════════
+       BLOG LATEST
+  ══════════════════════════════════════════ -->
+  {latestPosts.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>מהבלוג שלנו</h2>
+          <a href="/blog" class="btn btn-outline">כל הפוסטים</a>
+        </div>
+        <div class="grid-3">
+          {latestPosts.map(post => (
+            <a href={`/blog/${post.slug}`} class="card post-card">
+              {post.data.topImage && (
+                <img src={post.data.topImage} alt={post.data.title} class="card-img" loading="lazy" />
+              )}
+              <div class="card-body">
+                <p class="card-meta">{formatDate(post.data.date)}</p>
+                <h3 class="card-title">{post.data.title}</h3>
+                {post.data.excerpt && <p class="card-excerpt">{post.data.excerpt}</p>}
+                <span class="card-link">קרא עוד</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ══════════════════════════════════════════
+       DONATIONS CTA
+  ══════════════════════════════════════════ -->
+  {donations && (
+    <section class="section donate-section"
+      style={donations.image ? `background-image: url('${donations.image}')` : ''}>
+      <div class="container donate-inner">
+        <p class="donate-text">{stripMd(donations.text ?? '')}</p>
+        {donations.buttonLink && (
+          <a href={donations.buttonLink.url} class="btn btn-primary"
+             target={donations.buttonLink.url?.startsWith('http') ? '_blank' : undefined}>
+            {donations.buttonText ?? 'לתרומה'}
+          </a>
+        )}
+      </div>
+    </section>
+  )}
+
+</Base>
+
+<script>
+  // ── רמקול ────────────────────────────────────
+  const video     = document.getElementById('hero-video') as HTMLVideoElement;
+  const soundBtn  = document.getElementById('sound-btn');
+  const iconMuted = document.getElementById('icon-muted');
+  const iconSound = document.getElementById('icon-sound');
+
+  soundBtn?.addEventListener('click', () => {
+    if (!video) return;
+    video.muted = !video.muted;
+    iconMuted?.classList.toggle('hidden', !video.muted);
+    iconSound?.classList.toggle('hidden',  video.muted);
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    overlay?.classList.remove('visible');
+  });
+</script>
+
+<style>
+/* ── Hero ──────────────────────────────────────── */
+.hero {
+  position: relative;
+  height: 100dvh;
+  min-height: 600px;
+  overflow: hidden;
+}
+
+.hero-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10,25,8,0.50) 0%,
+    rgba(10,25,8,0.08) 45%,
+    rgba(10,25,8,0.22) 100%
+  );
+  z-index: 1;
+}
+
+/* ── כיתוב מרכזי עליון ─────────────────────────── */
+.hero-title-wrap {
+  position: absolute;
+  top: 80px;
+  left: 50%; transform: translateX(-50%);
+  z-index: 3;
+  text-align: center;
+  width: 90%;
+  pointer-events: none;
+}
+.hero-title {
+  color: white;
+  font-size: clamp(1.5rem, 3.5vw, 2.6rem);
+  font-weight: 900;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.65);
+  line-height: 1.3;
+}
+
+
+/* ── אייקוני צד שמאל ───────────────────────────── */
+.side-icons-left {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+}
+.side-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+}
+.side-icon img {
+  width: 54px; height: 54px;
+  object-fit: contain;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.45));
+}
+.side-icon:hover img { transform: scale(1.1); }
+.side-icon span {
+  font-size: 0.62rem;
+  color: white;
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+  max-width: 58px;
+  line-height: 1.2;
+}
+
+/* ── כפתור רמקול – פינה ימין תחתון ────────────── */
+.sound-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.5);
+  border-radius: 50%;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: background 0.2s;
+  backdrop-filter: blur(4px);
+}
+.sound-btn:hover { background: rgba(255,255,255,0.28); }
+.sound-icon { width: 20px; height: 20px; }
+.sound-icon.hidden { display: none; }
+
+/* ── Banners ────────────────────────────────────── */
+.banner-section { background: var(--clr-bg); }
+.banner-section:nth-of-type(even) { background: var(--clr-oak-50); }
+.banner-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--space-12); align-items: center;
+}
+.banner-flip .banner-text { order: 2; }
+.banner-flip .banner-img-wrap { order: 1; }
+.banner-text { display: flex; flex-direction: column; gap: var(--space-6); }
+.banner-text p { font-size: var(--fs-lg); color: var(--clr-muted); }
+.banner-img { width: 100%; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); }
+
+/* ── Events ─────────────────────────────────────── */
+.events-section {
+  background: var(--clr-oak-800) center/cover no-repeat;
+  background-blend-mode: multiply;
+  position: relative;
+}
+.events-section::before {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(10,35,5,0.75);
+}
+.events-section .container { position: relative; z-index: 1; }
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-6);
+}
+.event-card {
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  backdrop-filter: blur(4px);
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+.event-date  { font-size: var(--fs-sm); font-weight: 700; color: var(--clr-oak-400); }
+.event-title { font-size: var(--fs-xl); color: white; line-height: 1.3; }
+.event-desc  { font-size: var(--fs-sm); color: rgba(255,255,255,0.75); }
+.event-btn   { color: white; border-color: rgba(255,255,255,0.5); align-self: flex-start; }
+.event-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+
+.post-card { text-decoration: none; color: inherit; }
+
+/* ── Donate ─────────────────────────────────────── */
+.donate-section { background: var(--clr-earth-100) center/cover; }
+.donate-inner {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8); padding: var(--space-12) 0; flex-wrap: wrap;
+}
+.donate-text {
+  font-size: var(--fs-xl); font-family: var(--ff-display);
+  font-weight: 700; color: var(--clr-oak-900); max-width: 560px;
+}
+
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .logo-overlay-img { width: 60px; height: 60px; }
+  .side-icon img { width: 42px; height: 42px; }
+  .banner-grid { grid-template-columns: 1fr; }
+  .banner-flip .banner-text, .banner-flip .banner-img-wrap { order: unset; }
+  .donate-inner { flex-direction: column; }
+}
+</style>

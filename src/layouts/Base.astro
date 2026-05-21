@@ -1,0 +1,59 @@
+---
+// src/layouts/Base.astro
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = 'עמותת אלוני ישראל',
+  description = 'עמותת אלוני ישראל פועלת לטפח, לשמור ולהגן על עצי האלון ברחבי הארץ ולקדם את האלון כעץ הלאומי של ישראל.',
+  image = '/images/og-default.jpg',
+  noindex = false,
+} = Astro.props;
+
+const siteName = 'אלוני ישראל';
+const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalURL} />
+  {noindex && <meta name="robots" content="noindex" />}
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image"       content={new URL(image, Astro.site)} />
+  <meta property="og:url"         content={canonicalURL} />
+  <meta property="og:locale"      content="he_IL" />
+  <meta property="og:site_name"   content={siteName} />
+
+  <!-- Favicon -->
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <!-- Fonts preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body>
+  <Header />
+  <main id="main-content">
+    <slot />
+  </main>
+  <Footer />
+</body>
+</html>

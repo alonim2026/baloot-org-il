@@ -1,0 +1,103 @@
+---
+// src/pages/blog/index.astro
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+function fmt(d: Date | string) {
+  return new Date(d).toLocaleDateString('he-IL', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+
+<Base title="בלוג" description="כתבות ועדכונים מעמותת אלוני ישראל">
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="tag">תוכן ועדכונים</span>
+      <h1>הבלוג שלנו</h1>
+      <p class="hero-sub">כתבות, ראיונות ועדכונים מעולם האלונים</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {posts.length === 0 ? (
+        <p class="empty">אין פוסטים עדיין. הוסיפו תוכן דרך Decap CMS ב-<a href="/admin">/admin</a>.</p>
+      ) : (
+        <div class="post-grid">
+          {/* Featured first post */}
+          {posts[0] && (
+            <a href={`/blog/${posts[0].slug}`} class="featured-post card">
+              {posts[0].data.topImage && (
+                <img src={posts[0].data.topImage} alt={posts[0].data.title} class="featured-img" loading="eager" />
+              )}
+              <div class="card-body">
+                <p class="card-meta">{fmt(posts[0].data.date)}</p>
+                <h2 class="card-title">{posts[0].data.title}</h2>
+                {posts[0].data.excerpt && <p class="card-excerpt">{posts[0].data.excerpt}</p>}
+                <span class="card-link">קרא עוד</span>
+              </div>
+            </a>
+          )}
+
+          {/* Rest as grid */}
+          <div class="grid-3 rest-grid">
+            {posts.slice(1).map(post => (
+              <a href={`/blog/${post.slug}`} class="card">
+                {post.data.topImage && (
+                  <img src={post.data.topImage} alt={post.data.title} class="card-img" loading="lazy" />
+                )}
+                <div class="card-body">
+                  <p class="card-meta">{fmt(post.data.date)}</p>
+                  <h3 class="card-title">{post.data.title}</h3>
+                  {post.data.excerpt && <p class="card-excerpt">{post.data.excerpt}</p>}
+                  <span class="card-link">קרא עוד</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+</Base>
+
+<style>
+.page-hero {
+  background: var(--clr-oak-900);
+  color: white;
+  padding: var(--space-16) 0 var(--space-12);
+}
+.page-hero h1 { color: white; margin: var(--space-4) 0 var(--space-3); }
+.hero-sub { font-size: var(--fs-lg); opacity: 0.8; }
+
+.post-grid { display: flex; flex-direction: column; gap: var(--space-12); }
+
+.featured-post {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  text-decoration: none;
+  color: inherit;
+  min-height: 340px;
+}
+.featured-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  max-height: 420px;
+}
+.featured-post .card-title { font-size: var(--fs-2xl); }
+.featured-post .card-body { padding: var(--space-8); }
+
+.rest-grid { margin-top: 0; }
+.grid-3 a { text-decoration: none; color: inherit; }
+
+.empty { text-align: center; padding: var(--space-16) 0; color: var(--clr-muted); }
+
+@media (max-width: 700px) {
+  .featured-post { grid-template-columns: 1fr; }
+  .featured-img { max-height: 240px; }
+}
+</style>

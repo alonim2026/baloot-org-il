@@ -1,0 +1,154 @@
+---
+// src/pages/about.astro
+import Base from '../layouts/Base.astro';
+import { getEntry, render } from 'astro:content';
+
+const about = await getEntry('pages', 'about');
+const { Content } = await render(about);
+const { heading, intro, heroImage, banner, teamTitle, team } = about.data;
+
+function stripMd(text: string = '') {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\n/g, ' ')
+    .trim();
+}
+---
+
+<Base title="אודותינו" description="עמותת אלוני ארץ ישראל הוקמה ב-2019 לשמירה, טיפוח וקידום עצי האלון בישראל">
+
+  <!-- Hero -->
+  <section class="about-hero" style={heroImage ? `--hero: url('${heroImage}')` : ''}>
+    <div class="hero-overlay"></div>
+    <div class="container about-hero-content">
+      <h1>{heading ?? 'אודותינו'}</h1>
+    </div>
+  </section>
+
+  <!-- Intro + Body (מעובד מ-Markdown) -->
+  <section class="section">
+    <div class="container prose">
+      <Content />
+    </div>
+  </section>
+
+  <!-- Banner -->
+  {banner && (
+    <section class="banner-strip" style={`background: ${banner.backgroundColor ?? 'var(--clr-oak-50)'}`}>
+      <div class="container banner-inner">
+        <div class="banner-body">
+          {banner.text && <p>{stripMd(banner.text)}</p>}
+          {banner.buttonLink && (
+            <a href={banner.buttonLink.url} class="btn btn-primary" target="_blank" rel="noopener">
+              {banner.buttonText}
+            </a>
+          )}
+        </div>
+        {banner.image && <img src={banner.image} alt="" class="banner-img" />}
+      </div>
+    </section>
+  )}
+
+  <!-- Team -->
+  {team && team.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <h2 class="team-heading">{teamTitle ?? 'חברי הנהלת העמותה'}</h2>
+        <div class="team-grid">
+          {team.map(member => (
+            <div class="member-card">
+              {member.image
+                ? <img src={member.image} alt={member.name} class="member-img" loading="lazy" />
+                : <div class="member-avatar">{member.name.charAt(0)}</div>
+              }
+              <div class="member-info">
+                <h3 class="member-name">{member.name}</h3>
+                {member.occupation && <p class="member-role">{member.occupation}</p>}
+                {member.description && <p class="member-bio">{stripMd(member.description)}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+</Base>
+
+<style>
+.about-hero {
+  min-height: 340px;
+  display: flex;
+  align-items: flex-end;
+  background: var(--hero, var(--clr-oak-800)) center/cover no-repeat;
+  position: relative;
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,30,5,0.80), rgba(10,30,5,0.35));
+}
+.about-hero-content {
+  position: relative; z-index: 1;
+  padding-bottom: var(--space-12);
+}
+.about-hero-content h1 { color: white; }
+
+.banner-strip { padding: var(--space-12) 0; }
+.banner-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-10);
+  align-items: center;
+}
+.banner-body { display: flex; flex-direction: column; gap: var(--space-6); }
+.banner-img { width: 240px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+
+.team-heading { margin-bottom: var(--space-10); }
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+  gap: var(--space-8);
+}
+.member-card {
+  display: flex;
+  gap: var(--space-6);
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  align-items: flex-start;
+}
+.member-img {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 3px solid var(--clr-oak-100);
+}
+.member-avatar {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: var(--clr-oak-700);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-3xl);
+  font-family: var(--ff-display);
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.member-name { font-size: var(--fs-xl); margin-bottom: var(--space-1); }
+.member-role { font-size: var(--fs-sm); color: var(--clr-oak-700); font-weight: 600; margin-bottom: var(--space-3); }
+.member-bio { font-size: var(--fs-sm); color: var(--clr-muted); line-height: 1.7; }
+
+@media (max-width: 860px) {
+  .banner-inner { grid-template-columns: 1fr; }
+  .banner-img { width: 100%; }
+  .team-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .member-card { flex-direction: column; align-items: center; text-align: center; }
+}
+</style>

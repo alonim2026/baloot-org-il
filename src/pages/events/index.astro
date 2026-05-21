@@ -1,0 +1,91 @@
+---
+// src/pages/events/index.astro
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const events = (await getCollection('events'))
+  .sort((a, b) => new Date(b.data.date ?? 0).getTime() - new Date(a.data.date ?? 0).getTime());
+---
+
+<Base title="לוח אירועים" description="אירועים, כנסים וימי עיון של עמותת אלוני ישראל">
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="tag">פגישות ומפגשים</span>
+      <h1>לוח אירועים</h1>
+      <p class="hero-sub">כנסים, ימי עיון ואירועי קהילה</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {events.length === 0 ? (
+        <p class="empty">אין אירועים קרובים. עקבו אחרינו בפייסבוק לעדכונים.</p>
+      ) : (
+        <div class="events-list">
+          {events.map(event => (
+            <div class="event-row">
+              {event.data.topImage && (
+                <img src={event.data.topImage} alt={event.data.title} class="event-img" loading="lazy" />
+              )}
+              <div class="event-info">
+                {event.data.eventDate && <p class="event-date">{event.data.eventDate}</p>}
+                <h2 class="event-title">{event.data.title}</h2>
+                {event.data.location && <p class="event-loc">📍 {event.data.location}</p>}
+                {event.data.description && <p class="event-desc">{event.data.description}</p>}
+                <div class="event-actions">
+                  <a href={`/events/${event.slug}`} class="btn btn-outline">פרטים נוספים</a>
+                  {event.data.link && (
+                    <a href={event.data.link.url} class="btn btn-primary" target="_blank" rel="noopener">
+                      {event.data.link.title ?? 'הרשמה'}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+</Base>
+
+<style>
+.page-hero {
+  background: linear-gradient(135deg, var(--clr-oak-800), var(--clr-earth-700));
+  color: white; padding: var(--space-16) 0 var(--space-12);
+}
+.page-hero h1 { color: white; margin: var(--space-4) 0 var(--space-3); }
+.hero-sub { font-size: var(--fs-lg); opacity: 0.8; }
+
+.events-list { display: flex; flex-direction: column; gap: var(--space-8); }
+
+.event-row {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--space-10);
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.event-img { width: 100%; height: 100%; object-fit: cover; min-height: 200px; }
+.event-info {
+  padding: var(--space-8);
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+.event-date { font-size: var(--fs-sm); font-weight: 700; color: var(--clr-oak-700); }
+.event-title { font-size: var(--fs-2xl); color: var(--clr-oak-900); line-height: 1.3; }
+.event-loc { font-size: var(--fs-sm); color: var(--clr-muted); }
+.event-desc { color: var(--clr-muted); font-size: var(--fs-md); }
+.event-actions { display: flex; gap: var(--space-4); flex-wrap: wrap; margin-top: auto; }
+
+.empty { text-align: center; padding: var(--space-16) 0; color: var(--clr-muted); }
+
+@media (max-width: 700px) {
+  .event-row { grid-template-columns: 1fr; }
+  .event-img { max-height: 200px; }
+}
+</style>

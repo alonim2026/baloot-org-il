@@ -1,0 +1,181 @@
+---
+const NAV = [
+  { href: '/',          label: 'דף הבית'      },
+  { href: '/about',     label: 'אודותינו'      },
+  { href: '/articles',  label: 'עץ האלון'      },
+  { href: '/guides',    label: 'מדריכים'       },
+  { href: '/projects',  label: 'פרויקטים'      },
+  { href: '/blog',      label: 'בלוג'          },
+  { href: '/events',    label: 'לוח אירועים'   },
+  { href: '/contact',   label: 'צור קשר'       },
+  { href: '/english',   label: 'English'       },
+];
+const pathname = Astro.url.pathname;
+const isHome = pathname === '/';
+---
+
+<header class:list={['site-header', { 'header-home': isHome, 'header-solid': !isHome }]}>
+  <div class="container header-inner">
+    <a href="/" class="logo">
+      
+    </a>
+    <nav class="main-nav">
+      <ul>
+        {NAV.map(link => (
+          <li>
+            <a href={link.href} class:list={['nav-link', { active: pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href)) }]}>
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <a href="/join" class="btn btn-cta header-cta">הצטרפו אלינו</a>
+    <button class="hamburger" id="menu-toggle" aria-label="פתח תפריט" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <ul>
+      {NAV.map(link => (
+        <li><a href={link.href} class="mobile-nav-link">{link.label}</a></li>
+      ))}
+    </ul>
+  </div>
+  <!-- לוגו בבאנר -->
+  <img src="/images/logo-circle.jpg" alt="עמותת אלוני ישראל" class="header-logo-badge" />
+</header>
+
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const nav = document.getElementById('mobile-nav');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    nav?.setAttribute('aria-hidden', String(open));
+    nav?.classList.toggle('open', !open);
+    toggle.classList.toggle('open', !open);
+  });
+  const header = document.querySelector('.site-header');
+  if (header?.classList.contains('header-home')) {
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+  }
+</script>
+
+<style>
+:root {
+  --header-green: #2c3f29;
+}
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  transition: background 0.35s ease;
+}
+.header-solid {
+  background: var(--header-green);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+}
+.header-home {
+  background: linear-gradient(to bottom, rgba(20,38,18,0.72), rgba(20,38,18,0.0));
+  position: fixed;
+  width: 100%;
+}
+.header-home.scrolled {
+  background: var(--header-green);
+  position: sticky;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  height: var(--header-h);
+  gap: var(--space-6);
+}
+.logo img {
+  height: 52px;
+  width: auto;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+}
+.main-nav { flex: 1; min-width: 0; }
+.main-nav ul { display: flex; align-items: center; gap: 2px; }
+.nav-link {
+  display: block;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.92);
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.2); color: white; }
+.btn-cta {
+  background: rgba(255,255,255,0.18);
+  color: white;
+  border: 1.5px solid rgba(255,255,255,0.45);
+  font-size: 0.85rem;
+  padding: 7px 18px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+}
+.btn-cta:hover { background: rgba(255,255,255,0.28); color: white; }
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2);
+  flex-shrink: 0;
+}
+.hamburger span {
+  display: block;
+  width: 24px; height: 2px;
+  background: white;
+  border-radius: 2px;
+  transition: transform 0.25s, opacity 0.25s;
+  transform-origin: center;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-nav {
+  display: none;
+  padding: var(--space-4) var(--space-6);
+  background: var(--header-green);
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+.mobile-nav.open { display: block; }
+.mobile-nav ul { display: flex; flex-direction: column; gap: var(--space-1); }
+.mobile-nav-link {
+  display: block;
+  padding: 10px var(--space-3);
+  color: rgba(255,255,255,0.85);
+  font-size: var(--fs-md);
+}
+.mobile-nav-link:hover { background: rgba(255,255,255,0.12); color: white; }
+
+
+@media (max-width: 1000px) {
+  .main-nav { display: none; }
+  .header-cta { display: none; }
+  .hamburger { display: flex; }
+}
+.header-logo-badge {
+  position: absolute;
+  top: 4px;
+  right: 15px;
+  height: 60px;
+  width: 60px;
+  z-index: 250;
+  border-radius: 50%;
+  object-fit: cover;
+}
+</style>

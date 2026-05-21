@@ -1,0 +1,53 @@
+---
+// src/pages/guides/index.astro
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const guides = await getCollection('guides');
+---
+
+<Base title="מדריכים" description="מדריכים מעשיים על עצי אלון מעמותת אלוני ישראל">
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="tag">ידע מעשי</span>
+      <h1>מדריכים</h1>
+      <p class="hero-sub">מדריכים מעשיים על זיהוי, גידול וטיפול בעצי אלון</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {guides.length === 0 ? (
+        <p class="empty">מדריכים יתווספו בקרוב.</p>
+      ) : (
+        <div class="grid-3">
+          {guides.map(guide => (
+            <a href={`/guides/${guide.slug}`} class="card">
+              {guide.data.topImage && (
+                <img src={guide.data.topImage} alt={guide.data.title} class="card-img" loading="lazy" />
+              )}
+              <div class="card-body">
+                <h3 class="card-title">{guide.data.title}</h3>
+                {guide.data.excerpt && <p class="card-excerpt">{guide.data.excerpt}</p>}
+                <span class="card-link">קרא עוד</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+</Base>
+
+<style>
+.page-hero {
+  background: linear-gradient(135deg, var(--clr-earth-900), var(--clr-oak-800));
+  color: white; padding: var(--space-16) 0 var(--space-12);
+}
+.page-hero h1 { color: white; margin: var(--space-4) 0 var(--space-3); }
+.hero-sub { font-size: var(--fs-lg); opacity: 0.8; }
+.grid-3 a { text-decoration: none; color: inherit; }
+.empty { text-align: center; padding: var(--space-16) 0; color: var(--clr-muted); }
+</style>

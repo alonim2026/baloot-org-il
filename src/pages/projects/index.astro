@@ -1,0 +1,49 @@
+---
+// src/pages/projects/index.astro
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects'))
+  .sort((a, b) => new Date(b.data.date ?? 0).getTime() - new Date(a.data.date ?? 0).getTime());
+---
+
+<Base title="פרויקטים" description="פרויקטי שמירה, נטיעה ומיפוי של עמותת אלוני ישראל">
+
+  <section class="page-hero">
+    <div class="container">
+      <span class="tag">עשייה בשטח</span>
+      <h1>הפרויקטים שלנו</h1>
+      <p class="hero-sub">שמירה, נטיעה, מיפוי ושיקום — פרויקטי העמותה ברחבי הארץ</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container grid-2">
+      {projects.map(project => (
+        <a href={`/projects/${project.slug}`} class="card project-card">
+          {project.data.topImage && (
+            <img src={project.data.topImage} alt={project.data.title} class="card-img" loading="lazy" />
+          )}
+          <div class="card-body">
+            {project.data.status && <span class="tag">{project.data.status}</span>}
+            <h3 class="card-title">{project.data.title}</h3>
+            {project.data.excerpt && <p class="card-excerpt">{project.data.excerpt}</p>}
+            <span class="card-link">לפרויקט המלא</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+</Base>
+
+<style>
+.page-hero {
+  background: linear-gradient(135deg, var(--clr-earth-900), var(--clr-oak-800));
+  color: white; padding: var(--space-16) 0 var(--space-12);
+}
+.page-hero h1 { color: white; margin: var(--space-4) 0 var(--space-3); }
+.hero-sub { font-size: var(--fs-lg); opacity: 0.8; }
+.grid-2 a { text-decoration: none; color: inherit; }
+.project-card .card-img { height: 260px; }
+</style>
