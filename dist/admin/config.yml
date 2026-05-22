@@ -1,0 +1,232 @@
+# ═══════════════════════════════════════════════════════════
+# Decap CMS – עמותת אלוני ישראל / baloot.org.il
+# תצורה מלאה לכל האוספים
+# ═══════════════════════════════════════════════════════════
+
+# אחסון – Cloudflare Pages + GitHub OAuth
+backend:
+  name: github
+  repo: YOUR_GITHUB_USERNAME/baloot-org-il   # ← שנה לשם ה-repo שלך
+  branch: main
+  base_url: https://YOUR_CLOUDFLARE_WORKER_URL  # ← לאחר הגדרת OAuth
+
+# תמונות ניהול – נשמרות ב-public/uploads
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+# שפת ממשק
+locale: he
+
+# ═══════════════════════════════════════════════════════
+# אוספים
+# ═══════════════════════════════════════════════════════
+collections:
+
+  # ─────────────────────────────────────────────────────
+  # בלוג
+  # ─────────────────────────────────────────────────────
+  - name: blog
+    label: "📝 בלוג"
+    label_singular: "פוסט"
+    folder: src/content/blog
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} – {{date}}"
+    sortable_fields: [date, title]
+    view_groups:
+      - label: שנה
+        field: date
+        pattern: \d{4}
+    fields:
+      - { label: "כותרת",          name: title,    widget: string }
+      - { label: "Slug (כתובת URL)", name: slug,   widget: string, required: false,
+          hint: "השאירו ריק לחישוב אוטומטי מהכותרת (אנגלית בלבד!)" }
+      - { label: "תאריך",           name: date,    widget: datetime, format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false }
+      - { label: "תמונה ראשית",     name: topImage, widget: image, required: false }
+      - { label: "קיצור / תקציר",  name: excerpt,  widget: text,  required: false,
+          hint: "מופיע בכרטיסיית הבלוג ובפתיחת דפי מאמר" }
+      - { label: "מחבר/ת",         name: author,   widget: string, required: false }
+      - { label: "תגיות",           name: tags,     widget: list,  required: false }
+      - { label: "תוכן",            name: body,     widget: markdown }
+
+  # ─────────────────────────────────────────────────────
+  # מאמרים – עץ האלון
+  # ─────────────────────────────────────────────────────
+  - name: articles
+    label: "🌳 עץ האלון (מאמרים)"
+    label_singular: "מאמר"
+    folder: src/content/articles
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "כותרת",          name: title,    widget: string }
+      - { label: "Slug",           name: slug,     widget: string, required: false }
+      - { label: "תמונה ראשית",    name: topImage, widget: image,  required: false }
+      - { label: "תקציר",          name: excerpt,  widget: text,   required: false }
+      - { label: "תוכן",           name: body,     widget: markdown }
+
+  # ─────────────────────────────────────────────────────
+  # פרויקטים
+  # ─────────────────────────────────────────────────────
+  - name: projects
+    label: "🔨 פרויקטים"
+    label_singular: "פרויקט"
+    folder: src/content/projects
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "כותרת",       name: title,    widget: string }
+      - { label: "Slug",        name: slug,     widget: string, required: false }
+      - { label: "תאריך",       name: date,     widget: datetime, format: "YYYY-MM-DD", required: false }
+      - { label: "תמונה",       name: topImage, widget: image,  required: false }
+      - { label: "סטטוס",       name: status,   widget: select, required: false,
+          options: ["פעיל", "הושלם", "בהקמה"] }
+      - { label: "תקציר",       name: excerpt,  widget: text,   required: false }
+      - { label: "תוכן",        name: body,     widget: markdown }
+
+  # ─────────────────────────────────────────────────────
+  # אירועים
+  # ─────────────────────────────────────────────────────
+  - name: events
+    label: "📅 אירועים"
+    label_singular: "אירוע"
+    folder: src/content/events
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "שם האירוע",    name: title,      widget: string }
+      - { label: "Slug",         name: slug,       widget: string, required: false }
+      - { label: "תאריך (טכני)", name: date,       widget: datetime, format: "YYYY-MM-DD", required: false }
+      - { label: "תאריך (לתצוגה)", name: eventDate, widget: string, required: false,
+          hint: "לדוגמה: 3 ביולי 2025, 18:00" }
+      - { label: "מיקום",        name: location,   widget: string, required: false }
+      - { label: "תמונה",        name: topImage,   widget: image,  required: false }
+      - { label: "תיאור קצר",   name: description, widget: text,  required: false }
+      - label: "קישור לאירוע"
+        name: link
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { label: "טקסט הקישור", name: title, widget: string, required: false }
+          - { label: "כתובת URL",   name: url,   widget: string, required: false }
+      - { label: "תוכן מורחב",  name: body,       widget: markdown, required: false }
+
+  # ─────────────────────────────────────────────────────
+  # דפים מיוחדים (דף הבית, אודות)
+  # ─────────────────────────────────────────────────────
+  - name: pages
+    label: "⚙️ דפים (הגדרות)"
+    label_singular: "דף"
+    folder: src/content/pages
+    create: false   # ← אל תיצרו דפים חדשים – ערכו קיימים בלבד
+    slug: "{{slug}}"
+    files:
+
+      # ── דף הבית ───────────────────────────────────────
+      - name: home
+        label: "🏠 דף הבית"
+        file: src/content/pages/home.md
+        fields:
+          - { label: "כותרת (SEO)", name: title, widget: string }
+
+          - label: "Hero (באנר עליון)"
+            name: hero
+            widget: object
+            fields:
+              - { label: "כותרת גדולה",       name: title,           widget: string }
+              - { label: "כיתוב",              name: subtitle,        widget: text,   required: false }
+              - { label: "תמונת רקע",          name: backgroundImage, widget: image,  required: false }
+              - { label: "קובץ וידאו (URL)",   name: backgroundVideo, widget: string, required: false }
+
+          - { label: "טקסט מבוא",     name: intro,      widget: markdown, required: false }
+          - { label: "תמונת מבוא",    name: introImage, widget: image,    required: false }
+
+          - label: "באנרים (3 קטעים מרכזיים)"
+            name: banners
+            widget: list
+            fields:
+              - { label: "מזהה סוג",  name: kind,  widget: string, required: false }
+              - { label: "כותרת",     name: title, widget: string }
+              - { label: "טקסט",      name: text,  widget: markdown }
+              - { label: "תמונה",     name: image, widget: image,  required: false }
+              - label: "קישור"
+                name: link
+                widget: object
+                required: false
+                collapsed: true
+                fields:
+                  - { label: "טקסט",  name: title, widget: string, required: false }
+                  - { label: "URL",    name: url,   widget: string }
+
+          - label: "אירועים קרובים (בדף הבית)"
+            name: upcomingEvents
+            widget: list
+            required: false
+            fields:
+              - { label: "שם האירוע",  name: title,       widget: string }
+              - { label: "תאריך",      name: date,        widget: string, required: false }
+              - { label: "תיאור",      name: description, widget: text,   required: false }
+              - label: "קישור"
+                name: link
+                widget: object
+                required: false
+                collapsed: true
+                fields:
+                  - { label: "טקסט",  name: title, widget: string, required: false }
+                  - { label: "URL",    name: url,   widget: string }
+
+          - label: "קטע תרומות"
+            name: donations
+            widget: object
+            required: false
+            fields:
+              - { label: "טקסט",         name: text,       widget: text,   required: false }
+              - { label: "טקסט כפתור",   name: buttonText, widget: string, required: false }
+              - label: "קישור כפתור"
+                name: buttonLink
+                widget: object
+                required: false
+                fields:
+                  - { label: "URL",  name: url,    widget: string }
+                  - { label: "פתח בחלון חדש", name: target, widget: select, options: ["_blank", "_self"], default: "_blank", required: false }
+              - { label: "תמונת רקע",    name: image,      widget: image,  required: false }
+
+      # ── דף אודות ──────────────────────────────────────
+      - name: about
+        label: "👥 אודות"
+        file: src/content/pages/about.md
+        fields:
+          - { label: "כותרת (SEO)",    name: title,     widget: string }
+          - { label: "כותרת בדף",      name: heading,   widget: string, required: false }
+          - { label: "תמונת כותרת",    name: heroImage, widget: image,  required: false }
+          - { label: "תוכן מבוא",      name: intro,     widget: markdown, required: false }
+          - { label: "גוף הדף",        name: body,      widget: markdown, required: false }
+
+          - label: "באנר מ.א.י"
+            name: banner
+            widget: object
+            required: false
+            collapsed: true
+            fields:
+              - { label: "טקסט",           name: text,            widget: markdown, required: false }
+              - { label: "תמונה",          name: image,           widget: image,    required: false }
+              - { label: "צבע רקע (HEX)",  name: backgroundColor, widget: string,   required: false }
+              - { label: "טקסט כפתור",     name: buttonText,      widget: string,   required: false }
+              - label: "קישור"
+                name: buttonLink
+                widget: object
+                required: false
+                fields:
+                  - { label: "URL",    name: url,    widget: string }
+                  - { label: "חלון חדש", name: target, widget: select, options: ["_blank","_self"], default: "_blank", required: false }
+
+          - { label: "כותרת צוות",  name: teamTitle, widget: string, required: false }
+          - label: "חברי הנהלה"
+            name: team
+            widget: list
+            fields:
+              - { label: "שם",         name: name,        widget: string }
+              - { label: "תפקיד",      name: occupation,  widget: string, required: false }
+              - { label: "תיאור קצר",  name: description, widget: markdown, required: false }
+              - { label: "תמונה",      name: image,       widget: image,  required: false }

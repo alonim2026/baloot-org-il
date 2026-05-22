@@ -1,0 +1,1 @@
+import"./hoisted.BpwUtX6N.js";const t=document.getElementById("contact-form"),e=document.getElementById("form-success");t?.addEventListener("submit",async s=>{s.preventDefault();const c=new FormData(t);(await fetch(t.action,{method:"POST",body:c,headers:{Accept:"application/json"}})).ok&&(t.reset(),e&&(e.style.display="block"))});

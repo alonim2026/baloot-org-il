@@ -2,7 +2,6 @@
 title: דף הבית
 slug: home
 wpId: "7"
-layout: homepage
 wpType: page
 hero:
   title: להשיב את חורש האלונים הטבעי לשיאו
