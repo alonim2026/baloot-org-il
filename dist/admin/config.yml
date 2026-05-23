@@ -6,9 +6,10 @@
 # אחסון – Cloudflare Pages + GitHub OAuth
 backend:
   name: github
-  repo: YOUR_GITHUB_USERNAME/baloot-org-il   # ← שנה לשם ה-repo שלך
+  repo: alonim2026/baloot-org-il
   branch: main
-  base_url: https://YOUR_CLOUDFLARE_WORKER_URL  # ← לאחר הגדרת OAuth
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
 
 # תמונות ניהול – נשמרות ב-public/uploads
 media_folder: "public/uploads"
