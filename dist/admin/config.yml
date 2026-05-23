@@ -231,3 +231,18 @@ collections:
               - { label: "תפקיד",      name: occupation,  widget: string, required: false }
               - { label: "תיאור קצר",  name: description, widget: markdown, required: false }
               - { label: "תמונה",      name: image,       widget: image,  required: false }
+
+# ─────────────────────────────────────────────────────
+  # מדריכים
+  # ─────────────────────────────────────────────────────
+  - name: guides
+    label: "📖 מדריכים"
+    label_singular: "מדריך"
+    folder: src/content/guides
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "כותרת",       name: title,    widget: string }
+      - { label: "תמונה",       name: topImage, widget: image,  required: false }
+      - { label: "תקציר",       name: excerpt,  widget: text,   required: false }
+      - { label: "תוכן",        name: body,     widget: markdown }
